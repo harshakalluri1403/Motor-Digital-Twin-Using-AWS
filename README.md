@@ -15,6 +15,7 @@ The system architecture consists of:
 - Visualization: Grafana retrieves data from TwinMaker and presents it on various panels for real-time monitoring.
 ## Visual Representation
 The following images show the overall architecture and Grafana panels used in this project:
+
 Architecture Diagram:
 ![](https://github.com/harshakalluri1403/Motor-Digital-Twin-Using-AWS/blob/54ca9557d3fe7a9693dec2dd068f77f63f7052ab/Screenshot%202024-11-03%20020128.png) 
 
