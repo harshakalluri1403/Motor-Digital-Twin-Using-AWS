@@ -1,45 +1,95 @@
-# Motor Digital Twin using AWS
-This project demonstrates a digital twin model for monitoring a motor's speed using AWS IoT SiteWise, AWS IoT TwinMaker, and Grafana. The main focus of this project is to capture and visualize real-time speed data from a motor in a factory setting. By leveraging AWS services, we create a digital twin of the motor to provide detailed insights into its operational status.
+<div align="center">
 
-## Project Overview
-### Architecture
-The system architecture consists of:
-1. Factory Motor: The physical motor in a factory environment, which provides real-time speed data.
-2. AWS IoT SiteWise: Used to create and manage models and assets. It captures motor data (speed) and sends it to the AWS cloud.
-3. AWS IoT TwinMaker: Enables the creation of a digital twin of the motor. TwinMaker builds a virtual workspace where data from the physical motor is integrated and visualized.
-4. Grafana: Used for visualizing motor metrics. Through dashboards and panels, Grafana displays the speed of the motor, along with other key performance indicators.
+# Motor Digital Twin on AWS
 
-### Workflow
-- Data Collection: Motor speed data is collected and sent to AWS IoT SiteWise.
-- Data Modeling: AWS IoT TwinMaker receives the SiteWise data, processes it, and updates the digital twin model.
-- Visualization: Grafana retrieves data from TwinMaker and presents it on various panels for real-time monitoring.
-## Visual Representation
-The following images show the overall architecture and Grafana panels used in this project:
+### A live, 3D virtual replica of a factory motor — SiteWise ingests, TwinMaker models, Grafana shows it
 
-Architecture Diagram:
-![](https://github.com/harshakalluri1403/Motor-Digital-Twin-Using-AWS/blob/54ca9557d3fe7a9693dec2dd068f77f63f7052ab/Screenshot%202024-11-03%20020128.png) 
+![AWS IoT SiteWise](https://img.shields.io/badge/AWS-IoT%20SiteWise-232F3E?logo=amazonaws&logoColor=white)
+![AWS IoT TwinMaker](https://img.shields.io/badge/AWS-IoT%20TwinMaker-232F3E?logo=amazonaws&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-dashboards-F46800?logo=grafana&logoColor=white)
+![Python](https://img.shields.io/badge/python-boto3-3776AB?logo=python&logoColor=white)
+![Status](https://img.shields.io/badge/status-demo-lightgrey)
 
-Grafana Dashboard:
-![](https://github.com/harshakalluri1403/Motor-Digital-Twin-Using-AWS/blob/54ca9557d3fe7a9693dec2dd068f77f63f7052ab/Screenshot%202024-11-03%20010927.png) 
-![](https://github.com/harshakalluri1403/Motor-Digital-Twin-Using-AWS/blob/54ca9557d3fe7a9693dec2dd068f77f63f7052ab/Screenshot%202024-11-03%20010941.png) 
-![](https://github.com/harshakalluri1403/Motor-Digital-Twin-Using-AWS/blob/54ca9557d3fe7a9693dec2dd068f77f63f7052ab/Screenshot%202024-11-03%20010959.png) 
+[Architecture](#architecture) ·
+[Data flow](#data-flow) ·
+[Dashboards](#dashboards) ·
+[Setup](#setup)
 
-## Setup Instructions
-1. Create Assets in AWS IoT SiteWise:
-   - Define the motor as an asset in AWS IoT SiteWise.
-   - Configure asset properties to capture the speed of the motor.
-2. Configure AWS IoT TwinMaker:
-   - Set up TwinMaker workspace and resources.
-   - Link the SiteWise asset to TwinMaker to enable real-time data integration.
-3. Visualize in Grafana:
-   - Connect Grafana to AWS IoT TwinMaker.
-   - Create dashboards and panels to display motor speed and other relevant data.
+</div>
 
-## Key Features
-- Real-Time Monitoring: Track the motor's speed in real time.
-- Digital Twin Modeling: Provides a virtual representation of the motor using AWS IoT TwinMaker.
-- Customizable Dashboards: Grafana panels can be customized to include additional metrics or different visualization types.
-## Future Enhancements
-- Predictive Maintenance: Use machine learning to predict motor failures based on speed fluctuations.
-- Additional Metrics: Include other motor parameters, like temperature or vibration, for a comprehensive view.
-- Alerting System: Integrate alerts in Grafana to notify users of abnormal motor behavior.
+---
+
+A **digital twin** is a live virtual model of a physical thing, fed by that
+thing's real sensor data. This project builds one for a factory motor: speed
+readings stream into AWS, a 3D model of the motor is wired to them in IoT
+TwinMaker, and Grafana renders the whole thing on a dashboard you can watch in
+real time.
+
+<p align="center">
+<img src="Screenshot%202024-11-03%20020128.png" width="80%" alt="System architecture diagram">
+</p>
+
+## Architecture
+
+```
+ Factory motor ─▶ AWS IoT SiteWise ─▶ AWS IoT TwinMaker ─▶ Grafana
+   (speed data)     models & assets      3D digital twin     live dashboards
+```
+
+| Component | Role |
+| :--- | :--- |
+| **Motor** | The physical asset producing real-time speed data |
+| **AWS IoT SiteWise** | Models the motor as an asset and ingests its measurements |
+| **AWS IoT TwinMaker** | Binds a 3D model ([`models/motor.glb`](models/motor.glb)) to the live SiteWise data |
+| **Grafana** | Visualizes speed and KPIs on real-time panels |
+
+## Data flow
+
+For a working demo without physical hardware,
+[`scripts/senddata.py`](scripts/senddata.py) simulates the motor: once a second
+it generates a speed between 100–1000 and pushes it to the SiteWise property
+alias `/factory/Motor1/Speed` via `boto3`.
+
+```python
+client.batch_put_asset_property_value(entries=payload['entries'])
+```
+
+Point it at your region and asset alias, run it, and SiteWise → TwinMaker →
+Grafana light up with live values.
+
+## Dashboards
+
+<p align="center">
+<img src="Screenshot%202024-11-03%20010927.png" width="46%" alt="Grafana motor dashboard">
+<img src="Screenshot%202024-11-03%20010941.png" width="46%" alt="Grafana panel view">
+</p>
+<p align="center">
+<img src="Screenshot%202024-11-03%20010951.png" width="46%" alt="TwinMaker 3D scene">
+<img src="Screenshot%202024-11-03%20010959.png" width="46%" alt="Grafana KPI panel">
+</p>
+
+## Setup
+
+1. **SiteWise** — define the motor as an asset and add a *Speed* property.
+2. **TwinMaker** — create a workspace, import the 3D model
+   [`models/motor.glb`](models/motor.glb), and bind its component to the
+   SiteWise Speed property.
+3. **Feed data** — set your region and alias in
+   [`scripts/senddata.py`](scripts/senddata.py), then:
+   ```bash
+   pip install boto3
+   aws configure          # credentials with SiteWise write access
+   python scripts/senddata.py
+   ```
+4. **Grafana** — add the AWS IoT TwinMaker data source and build panels for
+   motor speed and other KPIs.
+
+## Roadmap
+
+- **Predictive maintenance** — flag likely failures from speed patterns
+- **More signals** — temperature, vibration, current
+- **Alerting** — Grafana alerts on abnormal behavior
+
+## Tech stack
+
+AWS IoT SiteWise · AWS IoT TwinMaker · Grafana · Python · boto3 · glTF (`.glb`)
