@@ -9,6 +9,7 @@
 ![Grafana](https://img.shields.io/badge/Grafana-dashboards-F46800?logo=grafana&logoColor=white)
 ![Python](https://img.shields.io/badge/python-boto3-3776AB?logo=python&logoColor=white)
 ![Status](https://img.shields.io/badge/status-demo-lightgrey)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 [Architecture](#architecture) ·
 [Data flow](#data-flow) ·
@@ -93,3 +94,7 @@ Grafana light up with live values.
 ## Tech stack
 
 AWS IoT SiteWise · AWS IoT TwinMaker · Grafana · Python · boto3 · glTF (`.glb`)
+
+## License
+
+Released under the [MIT License](LICENSE).
